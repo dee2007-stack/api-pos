@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Pagination\AbstractPaginator;
+
+class PaginatedResource extends JsonResource
+{
+    protected $resourceClass;
+
+    public function __construct(AbstractPaginator $paginator, string $resourceClass)
+    {
+        parent::__construct($paginator);
+        $this->resourceClass = $resourceClass;
+    }
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'items' => ($this->resourceClass)::collection($this->resource->items()),
+            'pagination' => [
+                'current_page' => $this->currentPage(),
+                'last_page' => $this->lastPage(),
+                'per_page' => $this->perPage(),
+                'total' => $this->total(),
+            ],
+        ];
+    }
+}
